@@ -1,0 +1,6 @@
+student_id,age,exam_season,courses_enrolled,completed_assignments,completion_rate,login_frequency,last_activity_days_ago,forum_posts_count
+STU-9001,20,1,4,4,1,5.5,1,10
+STU-9002,19,0,3,0,0,0.5,25,0
+STU-9003,25,1,2,1,0.5,2,7,2
+STU-9004,22,0,5,4,0.8,4.2,2,5
+STU-9005,21,1,4,1,0.25,1,14,0

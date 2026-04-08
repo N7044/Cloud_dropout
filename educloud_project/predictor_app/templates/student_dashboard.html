@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Portal - EduCloud</title>
+    <style>
+        :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --text-muted: #94a3b8; --border: #334155; --primary: #3b82f6; --danger: #ef4444; --safe: #10b981; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 40px 20px; }
+        .nav { max-width: 800px; margin: 0 auto 20px auto; display: flex; justify-content: space-between; align-items: center; }
+        .nav a { color: var(--text-muted); text-decoration: none; font-size: 14px; padding: 8px 12px; background: var(--card); border-radius: 6px; border: 1px solid var(--border); transition: 0.3s; }
+        .nav a:hover { color: var(--text); background: var(--border); }
+        .container { max-width: 800px; margin: auto; background: var(--card); padding: 40px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h2 { text-align: center; margin-top: 0; font-weight: 600; letter-spacing: 1px; }
+        .subtitle { text-align: center; color: var(--text-muted); margin-bottom: 35px; font-size: 15px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
+        .input-group { display: flex; flex-direction: column; }
+        label { font-weight: 600; margin-bottom: 8px; font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        input { padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 15px; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
+        button { grid-column: span 2; padding: 16px; background-color: var(--primary); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3); }
+        button:hover { background-color: #2563eb; transform: translateY(-2px); }
+        .result-card { margin-top: 35px; padding: 25px; text-align: center; border-radius: 12px; font-weight: bold; font-size: 22px; border: 1px solid transparent; }
+        .danger { background-color: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3); box-shadow: 0 0 20px rgba(239, 68, 68, 0.1); }
+        .safe { background-color: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3); box-shadow: 0 0 20px rgba(16, 185, 129, 0.1); }
+        .score-text { font-size: 16px; color: var(--text-muted); font-weight: normal; margin-top: 10px; display: block; }
+        .score-val { color: var(--text); font-weight: bold; font-size: 18px; }
+    </style>
+</head>
+<body>
+
+<div class="nav">
+    <span style="font-weight: bold; color: var(--primary);">EduCloud Student</span>
+    <a href="{% url 'logout' %}">Disconnect Session</a>
+</div>
+
+<div class="container">
+    <h2>🎓 Individual Trajectory Assessment</h2>
+    <p class="subtitle">Enter real-time metrics to query the predictive cloud model.</p>
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-grid">
+            <div class="input-group"><label>Age</label><input type="number" name="age" value="20" required></div>
+            <div class="input-group"><label>Exam Season (0=No, 1=Yes)</label><input type="number" name="exam_season" value="0" required></div>
+            <div class="input-group"><label>Courses Enrolled</label><input type="number" name="courses_enrolled" value="4" required></div>
+            <div class="input-group"><label>Completed Assignments</label><input type="number" name="completed_assignments" value="2" required></div>
+            <div class="input-group"><label>Completion Rate (0.0 - 1.0)</label><input type="number" step="0.01" name="completion_rate" value="0.50" required></div>
+            <div class="input-group"><label>Logins per Week</label><input type="number" step="0.1" name="login_frequency" value="3.5" required></div>
+            <div class="input-group"><label>Days Since Last Activity</label><input type="number" name="last_activity_days_ago" value="5" required></div>
+            <div class="input-group"><label>Forum Contributions</label><input type="number" name="forum_posts_count" value="1" required></div>
+            
+            <button type="submit">Run Neural Assessment</button>
+        </div>
+    </form>
+
+    {% if result %}
+        <div class="result-card {% if result.color == 'red' %}danger{% else %}safe{% endif %}">
+            <span style="color: {% if result.color == 'red' %}var(--danger){% else %}var(--safe){% endif %}; text-shadow: 0 0 10px currentColor;">{{ result.status }}</span>
+            <span class="score-text">Calculated Risk Score: <span class="score-val">{{ result.risk_score }}</span></span>
+        </div>
+    {% endif %}
+</div>
+
+</body>
+</html>

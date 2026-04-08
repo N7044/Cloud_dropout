@@ -1,0 +1,7 @@
+Django==5.0.3
+pandas
+scikit-learn
+joblib
+xgboost
+numpy
+gunicorn

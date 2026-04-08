@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduCloud - Login</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e9ecef;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .role-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .student-btn {
+            background-color: #28a745;
+        }
+        .student-btn:hover {
+            background-color: #218838;
+        }
+        .teacher-btn {
+            background-color: #007bff;
+        }
+        .teacher-btn:hover {
+            background-color: #0069d9;
+        }
+        .icon {
+            font-size: 24px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h1>EduCloud AI</h1>
+        <p>Drop-Out Prediction & Analytics System</p>
+        
+        <button class="role-btn student-btn" onclick="window.location.href='student_dashboard.html'">
+            <span class="icon"></span> Student Portal
+        </button>
+        
+        <button class="role-btn teacher-btn" onclick="window.location.href='teacher_dashboard.html'">
+            <span class="icon"></span> Teacher Portal
+        </button>
+    </div>
+
+</body>
+</html>

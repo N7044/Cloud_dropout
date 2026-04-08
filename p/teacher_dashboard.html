@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teacher Portal - Bulk Prediction</title>
+    <style>
+        body { font-family: sans-serif; padding: 40px; background-color: #f4f7f6; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 10px; }
+        .alert { color: red; font-weight: bold; }
+        .safe { color: green; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #0056b3; color: white; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>👨‍🏫 Teacher Portal: Class Analysis</h2>
+    <p>Upload a .csv file containing your students' data. The cloud model will identify students who need intervention.</p>
+    
+    <input type="file" id="csvFileInput" accept=".csv" style="margin-bottom: 20px;">
+    <button onclick="uploadFile()" style="padding: 10px; background: #0056b3; color: white; border: none; cursor: pointer;">Run Bulk Analysis</button>
+
+    <div id="results-area" style="display: none;">
+        <h3>Analysis Complete: <span id="count"></span> students processed</h3>
+        <table id="resultsTable">
+            <thead>
+                <tr>
+                    <th>Student ID</th>
+                    <th>Status</th>
+                    <th>Risk Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    async function uploadFile() {
+        const fileInput = document.getElementById('csvFileInput');
+        if (fileInput.files.length === 0) {
+            alert("Please select a file first!");
+            return;
+        }
+
+        // Package the file to send to the Cloud API
+        const formData = new FormData();
+        formData.append("file", fileInput.files[0]);
+
+        try {
+            // Send to the new /predict_bulk endpoint
+            const response = await fetch('http://127.0.0.1:5000/predict_bulk', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+            
+            if (data.error) {
+                alert("Error: " + data.error);
+                return;
+            }
+
+            // Display the results in the table
+            document.getElementById('results-area').style.display = 'block';
+            document.getElementById('count').innerText = data.total_processed;
+            
+            const tbody = document.querySelector('#resultsTable tbody');
+            tbody.innerHTML = ""; // Clear old results
+
+            data.results.forEach(student => {
+                const row = `<tr>
+                    <td>${student.student_id}</td>
+                    <td class="${student.needs_intervention ? 'alert' : 'safe'}">${student.status}</td>
+                    <td>${student.risk_score}</td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+
+        } catch (error) {
+            alert("Failed to connect to the server.");
+        }
+    }
+</script>
+
+</body>
+</html>

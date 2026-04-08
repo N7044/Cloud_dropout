@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Portal - EduCloud</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 40px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); position: relative; }
+        .back-btn { position: absolute; top: 20px; left: 20px; text-decoration: none; color: #0056b3; font-weight: bold; }
+        .back-btn:hover { text-decoration: underline; }
+        h2 { text-align: center; color: #333; margin-top: 20px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .input-group { display: flex; flex-direction: column; }
+        label { font-weight: bold; margin-bottom: 5px; font-size: 14px; color: #555; }
+        input { padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
+        button { grid-column: span 2; padding: 15px; background-color: #28a745; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #218838; }
+        #result-card { display: none; margin-top: 30px; padding: 20px; text-align: center; border-radius: 8px; font-weight: bold; font-size: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="login.html" class="back-btn">← Back to Portal</a>
+    
+    <h2>🎓 Student Portal: Self-Assessment</h2>
+    <p style="text-align: center; color: #666; margin-bottom: 30px;">Enter your current metrics to see your cloud-generated academic forecast.</p>
+
+    <div class="form-grid">
+        <div class="input-group"><label>Age</label><input type="number" id="age" value="20"></div>
+        <div class="input-group"><label>Exam Season (0=No, 1=Yes)</label><input type="number" id="exam_season" value="0"></div>
+        <div class="input-group"><label>Courses Enrolled</label><input type="number" id="courses_enrolled" value="4"></div>
+        <div class="input-group"><label>Completed Assignments</label><input type="number" id="completed_assignments" value="2"></div>
+        <div class="input-group"><label>Completion Rate (0.0 to 1.0)</label><input type="number" step="0.01" id="completion_rate" value="0.50"></div>
+        <div class="input-group"><label>Login Frequency (Logins/Week)</label><input type="number" step="0.1" id="login_frequency" value="3.5"></div>
+        <div class="input-group"><label>Days Since Last Activity</label><input type="number" id="last_activity_days_ago" value="5"></div>
+        <div class="input-group"><label>Forum Posts Count</label><input type="number" id="forum_posts_count" value="1"></div>
+        
+        <button onclick="predictDropout()">Run AI Assessment</button>
+    </div>
+
+    <div id="result-card">
+        <span id="status-text"></span><br>
+        <span style="font-size: 16px; color: #333;">Calculated Risk Score: <span id="risk-score"></span></span>
+    </div>
+</div>
+
+<script>
+    async function predictDropout() {
+        const studentData = {
+            age: parseFloat(document.getElementById('age').value),
+            exam_season: parseFloat(document.getElementById('exam_season').value),
+            courses_enrolled: parseFloat(document.getElementById('courses_enrolled').value),
+            completed_assignments: parseFloat(document.getElementById('completed_assignments').value),
+            completion_rate: parseFloat(document.getElementById('completion_rate').value),
+            login_frequency: parseFloat(document.getElementById('login_frequency').value),
+            last_activity_days_ago: parseFloat(document.getElementById('last_activity_days_ago').value),
+            forum_posts_count: parseFloat(document.getElementById('forum_posts_count').value)
+        };
+
+        try {
+            const response = await fetch('http://127.0.0.1:5000/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(studentData)
+            });
+
+            const result = await response.json();
+
+            const resultCard = document.getElementById('result-card');
+            const statusText = document.getElementById('status-text');
+            const riskScore = document.getElementById('risk-score');
+
+            resultCard.style.display = 'block';
+            resultCard.style.backgroundColor = result.risk_score.replace('%', '') > 50 ? '#ffe6e

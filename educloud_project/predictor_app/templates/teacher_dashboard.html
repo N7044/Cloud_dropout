@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Educator Portal - EduCloud</title>
+    <style>
+        :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --text-muted: #94a3b8; --border: #334155; --primary: #8b5cf6; --danger: #ef4444; --safe: #10b981; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; padding: 40px 20px; background-color: var(--bg); color: var(--text); margin: 0; }
+        .nav { max-width: 900px; margin: 0 auto 20px auto; display: flex; justify-content: space-between; align-items: center; }
+        .nav a { color: var(--text-muted); text-decoration: none; font-size: 14px; padding: 8px 12px; background: var(--card); border-radius: 6px; border: 1px solid var(--border); transition: 0.3s; margin-left: 10px; }
+        .nav a:hover { color: var(--text); background: var(--border); }
+        .container { max-width: 900px; margin: auto; background: var(--card); padding: 40px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h2 { margin-top: 0; font-weight: 600; letter-spacing: 1px; }
+        p { color: var(--text-muted); font-size: 15px; margin-bottom: 30px; line-height: 1.5; }
+        .error-box { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .upload-zone { border: 2px dashed var(--border); padding: 40px 20px; text-align: center; border-radius: 12px; margin-bottom: 20px; background: rgba(15, 23, 42, 0.5); transition: 0.3s; }
+        .upload-zone:hover { border-color: var(--primary); background: rgba(139, 92, 246, 0.05); }
+        input[type="file"] { color: var(--text-muted); font-size: 15px; }
+        input[type="file"]::file-selector-button { background: var(--border); color: var(--text); border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; margin-right: 15px; font-weight: bold; transition: 0.3s; }
+        input[type="file"]::file-selector-button:hover { background: #475569; }
+        .upload-btn { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; cursor: pointer; border-radius: 8px; font-size: 16px; font-weight: bold; transition: 0.3s; box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3); }
+        .upload-btn:hover { background: #7c3aed; transform: translateY(-2px); }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 20px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+        th, td { padding: 14px 20px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background-color: rgba(15, 23, 42, 0.8); color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background-color: rgba(255, 255, 255, 0.02); }
+        .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block; }
+        .alert { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
+        .safe { background: rgba(16, 185, 129, 0.1); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); }
+        .stat-header { color: var(--text); margin-top: 40px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .stat-count { color: var(--primary); font-size: 24px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="nav">
+    <span style="font-weight: bold; color: var(--primary);">EduCloud Educator</span>
+    <div>
+        <a href="{% url 'student_dashboard' %}">Test Student View</a>
+        <a href="{% url 'logout' %}">Disconnect Session</a>
+    </div>
+</div>
+
+<div class="container">
+    <h2>👨‍🏫 Bulk Class Analysis</h2>
+    <p>Upload your <b>.csv</b> class roster matrix. The predictive model will evaluate the entire dataset and flag students exhibiting high-risk behavioral patterns.</p>
+    
+    {% if error_msg %}
+        <div class="error-box">⚠️ {{ error_msg }}</div>
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="upload-zone">
+            <input type="file" name="csv_file" accept=".csv" required>
+        </div>
+        <button type="submit" class="upload-btn">Run Deep Class Analysis</button>
+    </form>
+
+    {% if results %}
+        <div class="stat-header">
+            <h3 style="margin:0;">Analysis Complete</h3>
+            <span class="stat-count">{{ total_processed }} <span style="font-size:14px; color:var(--text-muted); font-weight:normal;">Records Processed</span></span>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Student ID</th>
+                    <th>Predicted Trajectory</th>
+                    <th>Confidence Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in results %}
+                <tr>
+                    <td style="font-weight: 500; font-family: monospace; font-size: 14px;">{{ student.student_id }}</td>
+                    <td>
+                        <span class="status-badge {% if student.is_danger %}alert{% else %}safe{% endif %}">
+                            {{ student.status }}
+                        </span>
+                    </td>
+                    <td style="color: var(--text-muted);">{{ student.risk_score }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</div>
+
+</body>
+</html>
