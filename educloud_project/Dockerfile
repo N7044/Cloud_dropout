@@ -9,7 +9,9 @@ WORKDIR /app
 # so every COPY source is prefixed with the project subdirectory. Build locally
 # the same way: `docker build -f educloud_project/Dockerfile .` from the repo root.
 COPY educloud_project/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Generous timeout/retries: xgboost's wheel is ~130 MB and slow links stall
+# long enough to trip pip's default 15s read timeout.
+RUN pip install --no-cache-dir --timeout 120 --retries 10 -r requirements.txt
 
 # Copy all project files into the container
 COPY educloud_project/ .
